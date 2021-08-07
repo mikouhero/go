@@ -1,28 +1,20 @@
-package main 
+package main
 
-
-// 自定义定义需要的参数
-
-
-// 定义命令行flag参数，便于解析
-
-
-func init() {
-  
-  // todo
-  //flag.XXX
-  
-  flag.Parse()
-}
-
+import (
+	"stress-testing/internal/service"
+	_ "stress-testing/internal/service"
+)
 
 func main() {
-    
-  //解析数据 返回 request 对象
-  
-  
-  // 分发数据 开始处理
-  
-  
+
+
+	//验证必要参数
+	if ok := service.CheckFlagPrarmIsOk();!ok {
+		return
+	}
+
+	//返回 request 对象
+
+	// 分发数据 开始处理
 
 }
