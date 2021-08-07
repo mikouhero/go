@@ -40,6 +40,7 @@ func init() {
 	flag.IntVar(&Code, "code", Code, "请求成功的状态码")
 	flag.BoolVar(&Http2, "http2", Http2, "是否开http2.0")
 	flag.BoolVar(&KeepAlive, "k", KeepAlive, "是否开启长连接")
+	flag.Var(&Headers, "H", "自定义头信息传递给服务器 示例:-H 'Content-Type: application/json'")
 
 	flag.Parse()
 }
