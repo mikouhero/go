@@ -59,6 +59,7 @@ func CheckFlagPrarmIsOk() bool {
 	return true
 }
 
+// 校验合法的method
 func validMethod(method string) bool {
 	/*
 	     Method         = "OPTIONS"                ; Section 9.2

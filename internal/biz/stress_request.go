@@ -2,6 +2,7 @@ package biz
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"time"
 )
@@ -26,7 +27,7 @@ var (
 )
 
 func NewRequest(url string, code int, timeout time.Duration, debug bool, path string, reqHeaders []string,
-	reqBody string, maxCon int, http2 bool, keepalive bool,mehtod string) (sr *StressRequest, err error) {
+	reqBody string, maxCon int, http2 bool, keepalive bool, mehtod string) (sr *StressRequest, err error) {
 
 	// fixme  需要优化   请求判断
 	if reqBody != "" {
@@ -86,4 +87,13 @@ func getHeaderValue(v string, headers map[string]string) {
 
 	}
 
+}
+
+// 获取请求数据
+func (r *StressRequest) GetBody() (body io.Reader) {
+	return strings.NewReader(r.Body)
+}
+
+func (r *StressRequest) GetDebug() bool {
+	return r.Debug
 }
