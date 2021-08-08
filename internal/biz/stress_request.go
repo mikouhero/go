@@ -21,17 +21,15 @@ type StressRequest struct {
 }
 
 var (
-	mehtod  = "GET"
 	headers = make(map[string]string)
 	body    string
 )
 
 func NewRequest(url string, code int, timeout time.Duration, debug bool, path string, reqHeaders []string,
-	reqBody string, maxCon int, http2 bool, keepalive bool) (sr *StressRequest, err error) {
+	reqBody string, maxCon int, http2 bool, keepalive bool,mehtod string) (sr *StressRequest, err error) {
 
-	// fixme  需要优化
+	// fixme  需要优化   请求判断
 	if reqBody != "" {
-		mehtod = "POST"
 		body = reqBody
 	}
 	for _, value := range reqHeaders {
@@ -80,7 +78,7 @@ func getHeaderValue(v string, headers map[string]string) {
 
 		if _, ok := headers[key]; ok {
 			//追加
-			headers[key] = fmt.Sprintf("%s ;%s", headers[key], value)
+			headers[key] = fmt.Sprintf("%s; %s", headers[key], value)
 		} else {
 			headers[key] = value
 

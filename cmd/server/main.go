@@ -15,7 +15,7 @@ func main() {
 	}
 
 	// 获取
-	sr, err := biz.NewRequest(service.URL, service.Code, 0, false, "", service.Headers, service.Body, service.MaxCon, service.Http2, service.KeepAlive)
+	sr, err := biz.NewRequest(service.URL, service.Code, 0, false, "", service.Headers, service.Body, service.MaxCon, service.Http2, service.KeepAlive,service.Method)
 
 	if err != nil {
 		fmt.Printf("参数不合法 %v \n", err)

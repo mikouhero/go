@@ -3,6 +3,7 @@ package service
 import (
 	"flag"
 	"fmt"
+	"strings"
 )
 
 // 自定义header 参数
@@ -30,6 +31,7 @@ var (
 	Code             = 200   // 成功状态码
 	Http2            = false // 是否开启http2.0
 	KeepAlive        = false // 是否开启长连接
+	Method           = "GET" // 请求方式
 )
 
 func init() {
@@ -41,12 +43,13 @@ func init() {
 	flag.BoolVar(&Http2, "http2", Http2, "是否开http2.0")
 	flag.BoolVar(&KeepAlive, "k", KeepAlive, "是否开启长连接")
 	flag.Var(&Headers, "H", "自定义头信息传递给服务器 示例:-H 'Content-Type: application/json'")
-
+	flag.StringVar(&Method, "X", Method, "请求方式:GET POST ...")
 	flag.Parse()
 }
 
 func CheckFlagPrarmIsOk() bool {
-	if ConcurrentNumber == 0 || PerNumber == 0 || URL == "" {
+	Method = strings.ToUpper(Method)
+	if ConcurrentNumber == 0 || PerNumber == 0 || URL == "" || (!validMethod(Method)) {
 		fmt.Printf("示例: go run main.go -c 1 -n 1 -u https://www.baidu.com/ \n")
 		fmt.Printf("压测地址或curl路径必填 \n")
 		fmt.Printf("当前请求参数: -c %d -n %d  -u %s \n", ConcurrentNumber, PerNumber, URL)
@@ -54,4 +57,34 @@ func CheckFlagPrarmIsOk() bool {
 		return false
 	}
 	return true
+}
+
+func validMethod(method string) bool {
+	/*
+	     Method         = "OPTIONS"                ; Section 9.2
+	                    | "GET"                    ; Section 9.3
+	                    | "HEAD"                   ; Section 9.4
+	                    | "POST"                   ; Section 9.5
+	                    | "PUT"                    ; Section 9.6
+	                    | "DELETE"                 ; Section 9.7
+	                    | "TRACE"                  ; Section 9.8
+	                    | "CONNECT"                ; Section 9.9
+	                    | extension-method
+	   extension-method = token
+	     token          = 1*<any CHAR except CTLs or separators>
+	*/
+
+	if len(method) < 0 {
+
+		return false
+	}
+
+	m := []string{"OPTIONS", "GET", "POST", "PUT", "DELETE", "TRACE", "CONNECT"}
+
+	for _, v := range m {
+		if v == method {
+			return true
+		}
+	}
+	return false
 }
