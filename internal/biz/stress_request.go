@@ -9,16 +9,18 @@ import (
 
 // 压测请求的数据结构体
 type StressRequest struct {
-	URL       string            // 压测请求的url
-	Method    string            // 请求的方式 GET/POST/PUT...
-	Headers   map[string]string // 请求的头信息
-	Body      string            // 请求的body体
-	TimeOut   time.Duration     // 请求超时时间
-	Debug     bool              // 调试模式
-	MaxCon    int               //每个连接的请求数
-	HTTP2     bool              // 是否使用http2.0
-	KeepAlive bool              // 是否开启长链接
-	Code      int               // 验证状态码
+	URL              string            // 压测请求的url
+	Method           string            // 请求的方式 GET/POST/PUT...
+	Headers          map[string]string // 请求的头信息
+	Body             string            // 请求的body体
+	TimeOut          time.Duration     // 请求超时时间
+	Debug            bool              // 调试模式
+	MaxCon           int               //每个连接的请求数
+	HTTP2            bool              // 是否使用http2.0
+	KeepAlive        bool              // 是否开启长链接
+	Code             int               // 验证状态码
+	ConcurrentNumber uint64            // 并发数 启动n个协程
+	PerNumber        uint64            // 请求数 每个协程/并发的处理的请求数
 }
 
 var (
@@ -27,7 +29,7 @@ var (
 )
 
 func NewRequest(url string, code int, timeout time.Duration, debug bool, path string, reqHeaders []string,
-	reqBody string, maxCon int, http2 bool, keepalive bool, mehtod string) (sr *StressRequest, err error) {
+	reqBody string, maxCon int, http2 bool, keepalive bool, mehtod string,perNumber,concurrentNumber uint64) (sr *StressRequest, err error) {
 
 	// fixme  需要优化   请求判断
 	if reqBody != "" {
@@ -59,6 +61,8 @@ func NewRequest(url string, code int, timeout time.Duration, debug bool, path st
 		HTTP2:     http2,
 		KeepAlive: keepalive,
 		Code:      code,
+		ConcurrentNumber :concurrentNumber,
+		PerNumber        :perNumber,
 	}
 	return
 }
