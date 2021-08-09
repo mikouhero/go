@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"stress-testing/internal/biz"
 	"stress-testing/internal/server/client"
@@ -9,6 +10,7 @@ import (
 
 // http 请求处理
 func Request(chanID uint64, ch chan<- *biz.StressResult, sr *biz.StressRequest, wg *sync.WaitGroup) {
+
 	defer func() {
 		wg.Done()
 	}()
@@ -23,8 +25,10 @@ func Request(chanID uint64, ch chan<- *biz.StressResult, sr *biz.StressRequest, 
 			ReceivedBytes: contentLength,
 		}
 		result.SetID(chanID, i)
+		fmt.Println(result)
 		ch <- result
 	}
+	return
 
 }
 
@@ -40,6 +44,7 @@ func sendRequest(sr *biz.StressRequest) (bool, int, uint64, int64) {
 		requestTime   uint64
 	)
 	resp, requestTime, err = client.Request(sr)
+	fmt.Println(resp,requestTime,err)
 	if err != nil {
 		errCode = biz.HTTPERR
 	} else {
