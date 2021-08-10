@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"stress-testing/internal/biz"
+	"stress-testing/internal/biz/verify"
 	"stress-testing/internal/server/client"
 	"sync"
 )
@@ -37,7 +38,7 @@ func sendRequest(sr *biz.StressRequest) (bool, int, uint64, int64) {
 
 	var (
 		isSuccessed   = false
-		errCode       = biz.HTTPOK
+		errCode       = verify.HTTPOK
 		contentLength = int64(0)
 		err           error
 		resp          *http.Response
@@ -46,7 +47,7 @@ func sendRequest(sr *biz.StressRequest) (bool, int, uint64, int64) {
 	resp, requestTime, err = client.Request(sr)
 	fmt.Println(resp,requestTime,err)
 	if err != nil {
-		errCode = biz.HTTPERR
+		errCode = verify.HTTPERR
 	} else {
 		contentLength = resp.ContentLength
 		// todo 处理成功逻辑

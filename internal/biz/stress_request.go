@@ -3,6 +3,7 @@ package biz
 import (
 	"fmt"
 	"io"
+	"stress-testing/internal/biz/verify"
 	"strings"
 	"time"
 )
@@ -21,6 +22,8 @@ type StressRequest struct {
 	Code             int               // 验证状态码
 	ConcurrentNumber uint64            // 并发数 启动n个协程
 	PerNumber        uint64            // 请求数 每个协程/并发的处理的请求数
+	Form             string
+	Verify           string
 }
 
 var (
@@ -29,7 +32,7 @@ var (
 )
 
 func NewRequest(url string, code int, timeout time.Duration, debug bool, path string, reqHeaders []string,
-	reqBody string, maxCon int, http2 bool, keepalive bool, mehtod string,perNumber,concurrentNumber uint64) (sr *StressRequest, err error) {
+	reqBody string, maxCon int, http2 bool, keepalive bool, mehtod string, perNumber, concurrentNumber uint64) (sr *StressRequest, err error) {
 
 	// fixme  需要优化   请求判断
 	if reqBody != "" {
@@ -51,18 +54,20 @@ func NewRequest(url string, code int, timeout time.Duration, debug bool, path st
 		timeout = 15 * time.Second
 	}
 	sr = &StressRequest{
-		URL:       url,
-		Method:    mehtod,
-		Headers:   headers,
-		Body:      reqBody,
-		TimeOut:   timeout,
-		Debug:     debug,
-		MaxCon:    maxCon,
-		HTTP2:     http2,
-		KeepAlive: keepalive,
-		Code:      code,
-		ConcurrentNumber :concurrentNumber,
-		PerNumber        :perNumber,
+		URL:              url,
+		Method:           mehtod,
+		Headers:          headers,
+		Body:             reqBody,
+		TimeOut:          timeout,
+		Debug:            debug,
+		MaxCon:           maxCon,
+		HTTP2:            http2,
+		KeepAlive:        keepalive,
+		Code:             code,
+		ConcurrentNumber: concurrentNumber,
+		PerNumber:        perNumber,
+		Form:             "http",       // 默认http 协议
+		Verify:           "statusCode", // 返回状态码
 	}
 	return
 }
@@ -100,4 +105,18 @@ func (r *StressRequest) GetBody() (body io.Reader) {
 
 func (r *StressRequest) GetDebug() bool {
 	return r.Debug
+}
+
+// 通过参数获取map 键
+func (r *StressRequest) GetVerifyKey() (key string) {
+	return fmt.Sprintf("%s.%s", r.Form, r.Verify)
+}
+
+func (r *StressRequest) GetVerifyHttp() verify.VerifyHttp {
+	verifyFunc, ok := verify.VerifyMapHttp[r.GetVerifyKey()]
+	if !ok {
+		// todo 默认一个
+		panic("todo ")
+	}
+	return verifyFunc
 }
