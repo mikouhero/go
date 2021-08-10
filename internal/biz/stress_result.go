@@ -12,7 +12,7 @@ type StressResult struct {
 	ReceivedBytes int64  // 接收的字节数
 }
 
-//设置消息id
+//设置消息id 并发 + 第几次请求
 func (r *StressResult) SetID(chanID, number uint64) {
 	id := fmt.Sprintf("%d_%d", chanID, number)
 	r.ID = id

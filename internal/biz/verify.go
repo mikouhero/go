@@ -1,8 +1,8 @@
-package verify
+package biz
 
 import (
 	"net/http"
-	"stress-testing/internal/biz"
+	"sync"
 )
 
 const (
@@ -16,14 +16,22 @@ const (
 
 // 校验器
 type Verify interface {
-	GetCode() int  
+	GetCode() int
 	GetResult() bool
 }
 
 // http 校验器类型
-type VerifyHttp func( request *biz.StressRequest,response *http.Response) (code int, isSucceed bool)
+type VerifyHttp func(request *StressRequest, response *http.Response) (code int, isSucceed bool)
 
 var (
 	// http校验函数 集合
 	VerifyMapHttp = make(map[string]VerifyHttp)
+	// map 不是安全的
+	VerifyMapHttpMutex sync.Mutex
+)
+
+//支持的协议
+var (
+	// http协议
+	FormTypeHTTP = "http"
 )

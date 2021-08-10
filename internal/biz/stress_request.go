@@ -3,7 +3,6 @@ package biz
 import (
 	"fmt"
 	"io"
-	"stress-testing/internal/biz/verify"
 	"strings"
 	"time"
 )
@@ -112,8 +111,9 @@ func (r *StressRequest) GetVerifyKey() (key string) {
 	return fmt.Sprintf("%s.%s", r.Form, r.Verify)
 }
 
-func (r *StressRequest) GetVerifyHttp() verify.VerifyHttp {
-	verifyFunc, ok := verify.VerifyMapHttp[r.GetVerifyKey()]
+// 获取已注册的验证器
+func (r *StressRequest) GetVerifyHttp() VerifyHttp {
+	verifyFunc, ok := VerifyMapHttp[r.GetVerifyKey()]
 	if !ok {
 		// todo 默认一个
 		panic("todo ")

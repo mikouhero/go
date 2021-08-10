@@ -1,10 +1,8 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 	"stress-testing/internal/biz"
-	"stress-testing/internal/biz/verify"
 	"stress-testing/internal/server/client"
 	"sync"
 )
@@ -26,7 +24,6 @@ func Request(chanID uint64, ch chan<- *biz.StressResult, sr *biz.StressRequest, 
 			ReceivedBytes: contentLength,
 		}
 		result.SetID(chanID, i)
-		fmt.Println(result)
 		ch <- result
 	}
 	return
@@ -38,19 +35,19 @@ func sendRequest(sr *biz.StressRequest) (bool, int, uint64, int64) {
 
 	var (
 		isSuccessed   = false
-		errCode       = verify.HTTPOK
+		errCode       = biz.HTTPOK
 		contentLength = int64(0)
 		err           error
 		resp          *http.Response
 		requestTime   uint64
 	)
 	resp, requestTime, err = client.Request(sr)
-	fmt.Println(resp,requestTime,err)
 	if err != nil {
-		errCode = verify.HTTPERR
+		errCode = biz.HTTPERR
 	} else {
 		contentLength = resp.ContentLength
 		// todo 处理成功逻辑
+		errCode, isSuccessed = sr.GetVerifyHttp()(sr, resp)
 
 	}
 	return isSuccessed, errCode, requestTime, contentLength

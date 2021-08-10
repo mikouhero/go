@@ -8,7 +8,11 @@ import (
 	"time"
 )
 
-
+// 注册验证器
+func init() {
+	// 默认
+	biz.RegisterVerifyHttp("statusCode", biz.HttpStatusCode)
+}
 
 //处理请求数据
 func Dispose(sr *biz.StressRequest) {
