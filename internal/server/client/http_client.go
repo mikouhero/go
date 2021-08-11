@@ -1,7 +1,7 @@
 package client
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
 	"stress-testing/internal/biz"
 	"time"
@@ -9,7 +9,10 @@ import (
 
 func Request(sr *biz.StressRequest) (resp *http.Response, requestTime uint64, err error) {
 	// todo
-	time.Sleep(time.Second)
-	err =errors.New("todo")
+	startTime := time.Now()
+	resp, err = http.Get("http://www.baidu.com")
+	requestTime = uint64(time.Since(startTime))
+
+	fmt.Println("消耗时间",float64(requestTime)/1e9)
 	return
 }
