@@ -2,7 +2,9 @@ package data
 
 import (
 	"fmt"
+	"sort"
 	"stress-testing/internal/biz"
+	"strings"
 	"sync"
 	"time"
 )
@@ -21,6 +23,7 @@ var (
 	errCode          = make(map[int]int)   // 错误码对应的错误个数
 	stop             = make(chan struct{}) //结束标示
 	concurrentNumber uint64
+	speed            int64
 )
 
 // 接收请求结果并处理
@@ -37,12 +40,14 @@ func ReceivedStressResult(request *biz.StressRequest, ch <-chan *biz.StressResul
 		for {
 			select {
 			case <-ticker.C:
+				// todo why?
+				endTime := uint64(time.Now().UnixNano())
+				handleTotalTime = endTime - startTime
+				calculate()
 				//todo 输出结果
-				fmt.Println("adfadfadfadfadf")
 			case <-stop:
 
 				// 处理完成
-				fmt.Println("over")
 				return
 
 			}
@@ -52,7 +57,7 @@ func ReceivedStressResult(request *biz.StressRequest, ch <-chan *biz.StressResul
 	for stressResult := range ch {
 
 		//处理数据
-		handleTotalTime += stressResult.Time
+		requestTotalTime += stressResult.Time
 
 		// 单个请求最长时间
 		if maxTime < stressResult.Time {
@@ -88,16 +93,11 @@ func ReceivedStressResult(request *biz.StressRequest, ch <-chan *biz.StressResul
 		}
 
 	}
+
 	stop <- struct{}{}
 	endTime := uint64(time.Now().UnixNano())
-	requestTotalTime = endTime - startTime
-	fmt.Println(requestTotalTime)
+	handleTotalTime = endTime - startTime
 	calculate()
-}
-
-func calculateData(concurrent, handleTotleTime, requestTotleTime, maxTime, minTime, successNum, failureNum uint64,
-	chanIDLen int, errCode map[int]int, receivedBytes int64) {
-
 }
 
 var (
@@ -106,21 +106,53 @@ var (
 	maxTimeFloat     float64
 	minTimeFloat     float64
 	requestTimeFloat float64
+	RequestTimeList  []uint64 //所有请求响应时间
 )
 
 func calculate() {
 	//  每个协程成功数/总耗时(发送数据请求的总时间) (每秒)  每秒的响应请求数
 	qps = float64(successNum*1e9) / float64(handleTotalTime)
 
-	// 平均时长 总耗时/总请求数/并发数 纳秒=>毫秒
+	// 平均时长  成功个数/请求总耗时  毫秒
 	if successNum == 0 {
 		averageTime = 0
 	} else {
-		averageTime = float64(handleTotalTime) / float64(successNum*1e6*concurrentNumber)
+		averageTime = float64(successNum*1e6) / float64(requestTotalTime)
 	}
+	// 最大请求时间（毫秒）
 	maxTimeFloat = float64(maxTime) / 1e6
+	// 最小请求时间（毫秒）
 	minTimeFloat = float64(minTime) / 1e6
+	// 所有请求总耗时（秒）
 	requestTimeFloat = float64(requestTotalTime) / 1e9
 
-	fmt.Println(qps, maxTimeFloat, minTimeFloat, requestTimeFloat)
+	// 接收字节
+	if requestTimeFloat > 0 {
+		speed = int64(float64(receivedBytes) / requestTimeFloat)
+	}
+	s := fmt.Sprintf("%4ds│%7d│%7d│%7d│%8.2f│%8.2f│%8.2f│%8.2f│%8d│%8d│%v",
+		handleTotalTime/1e9,
+		chanIDNum,
+		successNum,
+		failedNum,
+		qps,
+		maxTimeFloat,
+		minTimeFloat,
+		averageTime,
+		receivedBytes,
+		speed,
+		printMap(errCode),
+	)
+	fmt.Println(s)
+}
+func printMap(errCode map[int]int) (mapStr string) {
+	var (
+		mapArr []string
+	)
+	for key, value := range errCode {
+		mapArr = append(mapArr, fmt.Sprintf("%d:%d", key, value))
+	}
+	sort.Strings(mapArr)
+	mapStr = strings.Join(mapArr, ";")
+	return
 }

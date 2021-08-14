@@ -44,6 +44,7 @@ func init() {
 	flag.BoolVar(&KeepAlive, "k", KeepAlive, "是否开启长连接")
 	flag.Var(&Headers, "H", "自定义头信息传递给服务器 示例:-H 'Content-Type: application/json'")
 	flag.StringVar(&Method, "X", Method, "请求方式:GET POST ...")
+	flag.StringVar(&Body, "d", Body, "传输数据")
 	flag.Parse()
 }
 

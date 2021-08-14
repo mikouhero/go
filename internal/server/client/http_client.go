@@ -1,18 +1,62 @@
 package client
 
 import (
-	"fmt"
+	"crypto/tls"
 	"net/http"
 	"stress-testing/internal/biz"
+	"stress-testing/internal/data"
 	"time"
 )
 
 func Request(sr *biz.StressRequest) (resp *http.Response, requestTime uint64, err error) {
-	// todo
-	startTime := time.Now()
-	resp, err = http.Get("http://www.baidu.com")
-	requestTime = uint64(time.Since(startTime))
+	//// todo
+	//startTime := time.Now()
+	//resp, err = http.Get("http://127.0.0.1")
+	//requestTime = uint64(time.Since(startTime))
+	//return
 
-	fmt.Println("消耗时间",float64(requestTime)/1e9)
+	request, err := http.NewRequest(sr.Method, sr.URL, sr.GetBody())
+	if err != nil {
+		return
+	}
+	// 设置host
+	if _, ok := sr.Headers["host"]; !ok {
+		request.Host = sr.Headers["Host"]
+	}
+
+	// 默认utf-8 字符集
+	if _, ok := sr.Headers["Content-Type"]; !ok {
+		if sr.Headers == nil {
+			sr.Headers = make(map[string]string)
+		}
+		sr.Headers["Content-Type"] = "application/x-www-form-urlencoded; charset=utf-8"
+	}
+
+	// 设置请求header
+	for key, val := range sr.Headers {
+		request.Header.Set(key, val)
+	}
+	tr := &http.Transport{}
+	var client *http.Client
+
+	if sr.HTTP2 {
+		//todo
+	} else {
+		// 跳过证书验证
+		tr = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+
+	}
+
+	client = &http.Client{
+		Transport: tr,
+		Timeout:   sr.TimeOut,
+	}
+	startTime := time.Now()
+	resp, err = client.Do(request)
+
+	requestTime = uint64(time.Since(startTime))
+	data.RequestTimeList =append(data.RequestTimeList,requestTime)
 	return
 }
