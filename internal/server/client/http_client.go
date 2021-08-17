@@ -8,6 +8,7 @@ import (
 	"time"
 )
 
+//发送http 请求
 func Request(sr *biz.StressRequest) (resp *http.Response, requestTime uint64, err error) {
 	//// todo
 	//startTime := time.Now()
@@ -55,7 +56,7 @@ func Request(sr *biz.StressRequest) (resp *http.Response, requestTime uint64, er
 	}
 	startTime := time.Now()
 	resp, err = client.Do(request)
-
+	// 计算请求所消耗的时间
 	requestTime = uint64(time.Since(startTime))
 	data.RequestTimeList =append(data.RequestTimeList,requestTime)
 	return

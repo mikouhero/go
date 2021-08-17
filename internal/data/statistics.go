@@ -98,6 +98,25 @@ func ReceivedStressResult(request *biz.StressRequest, ch <-chan *biz.StressResul
 	endTime := uint64(time.Now().UnixNano())
 	handleTotalTime = endTime - startTime
 	calculate()
+
+	//所有请求响应时间排序 ，底层包需要实现 Len ,Swap ，Less方法
+	a := Uint64List{}
+	a = RequestTimeList
+	// 排序好的数组
+	sort.Sort(a)
+
+	fmt.Println("\n\n")
+	fmt.Println("*************************  结果 stat  ****************************")
+	fmt.Println("请求总数（并发数*请求数 ）:", successNum+failedNum, "总请求时间:",
+		fmt.Sprintf("%.3f", float64(handleTotalTime)/1e9),
+		"秒", "successNum:", successNum, "failedNum:", failedNum)
+
+	fmt.Println("top80:", fmt.Sprintf("%.3f ms", float64(a[int(float64(len(a))*0.80)]/1e6)))
+	fmt.Println("top90:", fmt.Sprintf("%.3f ms", float64(a[int(float64(len(a))*0.90)]/1e6)))
+	fmt.Println("top95:", fmt.Sprintf("%.3f ms", float64(a[int(float64(len(a))*0.95)]/1e6)))
+	fmt.Println("top99:", fmt.Sprintf("%.3f ms", float64(a[int(float64(len(a))*0.99)]/1e6)))
+
+	fmt.Println("*************************  结果 end  ****************************")
 }
 
 var (
@@ -117,7 +136,7 @@ func calculate() {
 	if successNum == 0 {
 		averageTime = 0
 	} else {
-		averageTime = float64(successNum*1e6) / float64(requestTotalTime)
+		averageTime = float64(requestTotalTime) /float64(successNum*1e6)
 	}
 	// 最大请求时间（毫秒）
 	maxTimeFloat = float64(maxTime) / 1e6
@@ -144,7 +163,12 @@ func calculate() {
 		printMap(errCode),
 	)
 	fmt.Println(s)
+
+
+
 }
+
+// 将map 转为字符串
 func printMap(errCode map[int]int) (mapStr string) {
 	var (
 		mapArr []string
