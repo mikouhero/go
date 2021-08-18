@@ -11,7 +11,8 @@ import (
 // 注册验证器
 func init() {
 	// 默认
-	biz.RegisterVerifyHttp("statusCode", biz.HttpStatusCode)
+	biz.RegisterVerifyHttp("code", biz.HttpStatusCode)
+	biz.RegisterVerifyHttp("json", biz.HttpResponseJson)
 }
 
 //处理请求数据

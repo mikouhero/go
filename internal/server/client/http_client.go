@@ -10,11 +10,7 @@ import (
 
 //发送http 请求
 func Request(sr *biz.StressRequest) (resp *http.Response, requestTime uint64, err error) {
-	//// todo
-	//startTime := time.Now()
-	//resp, err = http.Get("http://127.0.0.1")
-	//requestTime = uint64(time.Since(startTime))
-	//return
+
 
 	request, err := http.NewRequest(sr.Method, sr.URL, sr.GetBody())
 	if err != nil {

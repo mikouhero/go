@@ -22,7 +22,7 @@ type StressRequest struct {
 	ConcurrentNumber uint64            // 并发数 启动n个协程
 	PerNumber        uint64            // 请求数 每个协程/并发的处理的请求数
 	Form             string
-	Verify           string
+	Verify           string //  code json
 }
 
 var (
@@ -31,7 +31,7 @@ var (
 )
 
 func NewRequest(url string, code int, timeout time.Duration, debug bool, path string, reqHeaders []string,
-	reqBody string, maxCon int, http2 bool, keepalive bool, mehtod string, perNumber, concurrentNumber uint64) (sr *StressRequest, err error) {
+	reqBody string, maxCon int, http2 bool, keepalive bool, mehtod string, perNumber, concurrentNumber uint64, verify string) (sr *StressRequest, err error) {
 
 	// fixme  需要优化   请求判断
 	if reqBody != "" {
@@ -65,8 +65,8 @@ func NewRequest(url string, code int, timeout time.Duration, debug bool, path st
 		Code:             code,
 		ConcurrentNumber: concurrentNumber,
 		PerNumber:        perNumber,
-		Form:             "http",       // 默认http 协议
-		Verify:           "statusCode", // 返回状态码
+		Form:             "http", // 默认http 协议
+		Verify:           verify, // 返回状态码
 	}
 	return
 }

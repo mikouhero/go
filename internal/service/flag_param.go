@@ -22,16 +22,17 @@ func (h *Header) Set(s string) error {
 
 // 定义命令行flag参数，便于解析
 var (
-	ConcurrentNumber uint64  // 并发数 启动n个协程
-	PerNumber        uint64  // 请求数 每个协程/并发的处理的请求数
-	URL              string  // 压测的url
-	Headers          Header  // 自定义头信息
-	Body             = ""    // http post 方式传输数据
-	MaxCon           = 1     // 单个连接的最大请求数
-	Code             = 200   // 成功状态码
-	Http2            = false // 是否开启http2.0
-	KeepAlive        = false // 是否开启长连接
-	Method           = "GET" // 请求方式
+	ConcurrentNumber uint64   // 并发数 启动n个协程
+	PerNumber        uint64   // 请求数 每个协程/并发的处理的请求数
+	URL              string   // 压测的url
+	Headers          Header   // 自定义头信息
+	Body             = ""     // http post 方式传输数据
+	MaxCon           = 1      // 单个连接的最大请求数
+	Code             = 200    // 成功状态码
+	Http2            = false  // 是否开启http2.0
+	KeepAlive        = false  // 是否开启长连接
+	Method           = "GET"  // 请求方式
+	Verify           = "code" // http相应状态码 json
 )
 
 func init() {
@@ -45,6 +46,7 @@ func init() {
 	flag.Var(&Headers, "H", "自定义头信息传递给服务器 示例:-H 'Content-Type: application/json'")
 	flag.StringVar(&Method, "X", Method, "请求方式:GET POST ...")
 	flag.StringVar(&Body, "d", Body, "传输数据")
+	flag.StringVar(&Verify, "verify", Verify,"校验成功方式：\n code：http状态码200（默认）\n json：返回的数据是json格式")
 	flag.Parse()
 }
 
