@@ -10,11 +10,14 @@ import (
 
 func main() {
 
+
+
 	//验证必要参数
 	if ok := service.CheckFlagPrarmIsOk(); !ok {
 		return
 	}
 
+	return
 	// 获取
 	sr, err := biz.NewRequest(service.URL, service.Code, 0, false, "", service.Headers, service.Body, service.MaxCon, service.Http2, service.KeepAlive, service.Method, service.PerNumber, service.ConcurrentNumber,service.Verify)
 

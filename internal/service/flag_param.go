@@ -22,34 +22,79 @@ func (h *Header) Set(s string) error {
 
 // 定义命令行flag参数，便于解析
 var (
-	ConcurrentNumber uint64   // 并发数 启动n个协程
-	PerNumber        uint64   // 请求数 每个协程/并发的处理的请求数
-	URL              string   // 压测的url
-	Headers          Header   // 自定义头信息
-	Body             = ""     // http post 方式传输数据
-	MaxCon           = 1      // 单个连接的最大请求数
-	Code             = 200    // 成功状态码
-	Http2            = false  // 是否开启http2.0
-	KeepAlive        = false  // 是否开启长连接
-	Method           = "GET"  // 请求方式
-	Verify           = "code" // http相应状态码 json
+	ConcurrentNumber uint64   = 1 // 并发数 启动n个协程
+	PerNumber        uint64   = 1 // 请求数 每个协程/并发的处理的请求数
+	URL              string       // 压测的url
+	Headers          Header       // 自定义头信息
+	Body             = ""         // http post 方式传输数据
+	MaxCon           = 1          // 单个连接的最大请求数
+	Code             = 200        // 成功状态码
+	Http2            = false      // 是否开启http2.0
+	KeepAlive        = false      // 是否开启长连接
+	Method           = "GET"      // 请求方式
+	Verify           = "code"     // http相应状态码 json
 )
 
 func init() {
-	flag.Uint64Var(&ConcurrentNumber, "c", ConcurrentNumber, "并发数")
-	flag.Uint64Var(&PerNumber, "n", PerNumber, "请求数")
-	flag.StringVar(&URL, "u", URL, "压测url")
-	flag.IntVar(&MaxCon, "m", MaxCon, "单个host最大连接数")
-	flag.IntVar(&Code, "code", Code, "请求成功的状态码")
-	flag.BoolVar(&Http2, "http2", Http2, "是否开http2.0")
-	flag.BoolVar(&KeepAlive, "k", KeepAlive, "是否开启长连接")
-	flag.Var(&Headers, "H", "自定义头信息传递给服务器 示例:-H 'Content-Type: application/json'")
-	flag.StringVar(&Method, "X", Method, "请求方式:GET POST ...")
-	flag.StringVar(&Body, "d", Body, "传输数据")
-	flag.StringVar(&Verify, "verify", Verify,"校验成功方式：\n code：http状态码200（默认）\n json：返回的数据是json格式")
-	flag.Parse()
+	/*
+		fmt.Print("请输入要压测的url (http://baidu.com):")
+		fmt.Scanln(&URL)
+		fmt.Println()
+		//校验
+		fmt.Print("请输入要压测的并发数 (非数字默认：1):")
+		fmt.Scanln(&ConcurrentNumber)
+		fmt.Println()
+
+		fmt.Print("请输入单个并发的请求数 (非数字默认：1):")
+		fmt.Scanln(&PerNumber)
+		fmt.Println()
+
+		s := fmt.Sprintf("请输入请求方式：\n"+
+			"%10s\n"+
+			"%11s\n"+
+			"%10s\n"+
+			"%13s\n",
+			"1: GET", "2: POST", "3: PUT", "4: DELETE")
+		fmt.Println(s)
+		var m int = 1
+		fmt.Scanln(&m)
+
+		fmt.Println()
+
+		fmt.Println("请输入请求的参数(参照CURL数据格式)")
+		fmt.Scanln(&Body)
+		fmt.Println()
+
+	*/
+
+	header()
 }
 
+func header() {
+	var h string = "Y"
+	fmt.Print("是否需要添加头信息 (Y/N): ")
+
+	fmt.Scanln(&h)
+
+	if "N" == strings.ToUpper(h) {
+		return
+	}
+
+	if "Y" != strings.ToUpper(h) && "N" != strings.ToUpper(h) {
+		fmt.Println()
+		s := fmt.Sprintf("  %25s", "输入有误, 请输入 `Y` 或者 `N`")
+		fmt.Println(s)
+		fmt.Println()
+
+		header()
+		return
+	}
+
+	var s string
+	//todo 处理header 逻辑
+
+
+}
 func CheckFlagPrarmIsOk() bool {
 	Method = strings.ToUpper(Method)
 	if ConcurrentNumber == 0 || PerNumber == 0 || URL == "" || (!validMethod(Method)) {
