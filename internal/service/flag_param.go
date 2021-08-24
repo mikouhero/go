@@ -1,8 +1,10 @@
 package service
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"os"
 	"strings"
 )
 
@@ -10,15 +12,15 @@ import (
 type Header []string
 
 // 将字符串切片转成字符串
-func (h *Header) String() string {
-	return fmt.Sprint(*h)
-}
-
-// 设置header 头信息
-func (h *Header) Set(s string) error {
-	*h = append(*h, s)
-	return nil
-}
+//func (h *Header) String() string {
+//	return fmt.Sprint(*h)
+//}
+//
+//// 设置header 头信息
+//func (h *Header) Set(s string) error {
+//	*h = append(*h, s)
+//	return nil
+//}
 
 // 定义命令行flag参数，便于解析
 var (
@@ -71,8 +73,13 @@ func init() {
 }
 
 func header() {
+	if len(Headers) !=0{
+		fmt.Printf("已添加的头信息 %v \n" ,Headers)
+	}
+
+
 	var h string = "Y"
-	fmt.Print("是否需要添加头信息 (Y/N): ")
+	fmt.Print("是否需要继续添加头信息 (Y/N): ")
 
 	fmt.Scanln(&h)
 
@@ -92,8 +99,11 @@ func header() {
 
 	var s string
 	//todo 处理header 逻辑
-
-
+	r := bufio.NewReader(os.Stdin)
+	bytes, _, _ := r.ReadLine()
+	s = string(bytes)
+	Headers = append(Headers, s)
+	header()
 }
 func CheckFlagPrarmIsOk() bool {
 	Method = strings.ToUpper(Method)
